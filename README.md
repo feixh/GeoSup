@@ -45,8 +45,8 @@ We also provide a subset of eVISMA, which is preprocessed and ready to use. See 
 
 ## Train on preprocessed data
 
-The preprocessed subset of eVISMA can be found [here]().
-1. Download the tar ball and unzip it into your directory of choice, say `/local2/Data/VOID`. And set the environment variable `export VOIDPATH=/local2/Data/VOID`
+The preprocessed subset of eVISMA can be found [here](https://www.dropbox.com/s/kccsd0h0wg85ytx/copyrooms.tar.gz?dl=0).
+1. Download the tar ball and unzip it into your directory of choice, say `/local2/Data/VOID`. And set the environment variable `export VOIDPATH=/local2/Data/VOID`. (Note in the VOID folder, you should see copyroom1, copyroom2, train.txt, etc.)
 
 
 4. In your terminal, go to `GeoSup/GeoNet` sub-directory, and execute the following command. Note you should replace `example_checkpoints` with directory of your choice to store checkpoints.
