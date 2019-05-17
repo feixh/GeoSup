@@ -14,6 +14,7 @@ In Proceedings of International Conference on Robotics and Automation (ICRA), 20
 ```
 
 Related materials:
+- [project site](https://feixh.github.io/projects/icra19/index.html)
 - [paper][icra19_paper], [poster][icra19_poster], and [slides][icra19_slides] as presented at ICRA, 2019.
 - [VISMA](https://github.com/feixh/VISMA) dataset used in the experiments.
 - [Extended VISMA (eVISMA)]() dataset, a large-scale extension of VISMA built for learning-based visual-inertial sensor fusion.
