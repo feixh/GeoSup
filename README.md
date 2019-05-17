@@ -8,10 +8,15 @@
 If you find the paper or the code in this repo useful, please cite the following paper:
 
 ```
-Geo-Supervised Visual Depth Prediction
-Xiaohan Fei, Alex Wong, and Stefano Soatto
-In Proceedings of International Conference on Robotics and Automation (ICRA), 2019.
+@incollection{feiWS19,
+  author    = {Fei, X. and Wong, A. and Soatto, S.},
+  title     = {Geo-Supervised Visual Depth Prediction},
+  booktitle = {Proceedings of the International Conference on Robotics and Automation (ICRA)},
+  year      = {2019},
+  month     = {May}
+}
 ```
+
 
 Related materials:
 - [project site](https://feixh.github.io/projects/icra19/index.html)
@@ -45,8 +50,9 @@ We also provide a subset of eVISMA, which is preprocessed and ready to use. See 
 
 ## Train on preprocessed data
 
-The preprocessed subset of eVISMA can be found [here](https://www.dropbox.com/s/kccsd0h0wg85ytx/copyrooms.tar.gz?dl=0).
-1. Download the tar ball and unzip it into your directory of choice, say `/local2/Data/VOID`. And set the environment variable `export VOIDPATH=/local2/Data/VOID`. (Note in the VOID folder, you should see copyroom1, copyroom2, train.txt, etc.)
+A preprocessed subset of eVISMA can be found [here](https://www.dropbox.com/s/kccsd0h0wg85ytx/copyrooms.tar.gz?dl=0). Follow the instructions below to use it.
+
+1. Download the tar ball and unzip it into your directory of choice, say `/home/feixh/Data/copyrooms`. And set the environment variable `export EXAMPLEPATH=/home/feixh/Data/copyrooms`. (Note in your data folder, you should see copyroom1, copyroom2, train.txt, etc.)
 
 
 4. In your terminal, go to `GeoSup/GeoNet` sub-directory, and execute the following command. Note you should replace `example_checkpoints` with directory of your choice to store checkpoints.
@@ -54,7 +60,7 @@ The preprocessed subset of eVISMA can be found [here](https://www.dropbox.com/s/
 ```
 python geonet_main.py \
   --mode train_rigid \
-  --dataset_dir $VOIDPATH \
+  --dataset_dir $EXAMPLEPATH \
   --checkpoint_dir example_checkpoints \
   --learning_rate 1e-4 \
   --seq_length 3 \
@@ -66,7 +72,7 @@ python geonet_main.py \
   --img_height 240 \
   --img_width 320 \
   --datatype void \
-  --validation_dir $VOIDPATH \
+  --validation_dir $EXAMPLEPATH \
   --validation_freq 2000 \
   --use_slam_pose \
   --use_sigl \
@@ -80,15 +86,15 @@ For the meaning of each of the arguments, see how they are defined at the top of
 - `use_slam_pose`: To use pose estimated by the VIO instead of the pose network. This is most useful for data with challenging motion. See the experiment section of our paper for more details.
 - `dispnet_encoder`: The architecture of the encoder, can be either `vgg` or `resnet50`.
 
-Note, the code is built on top of the GeoNet model of Yin *et al.* which jointly estimates depth and flow, but we only use it for the depth prediction, the flow network is not used maintained here.
+Note, the code is built on top of the GeoNet model of Yin *et al.* which jointly estimates depth and flow, but we only use it for depth prediction, the flow network is not used and maintained here.
 
 ## Data preparation
 
-To prepare the training data, you need to install the [Robot Operating System (ROS)](http://www.ros.org/) first. And do the following:
+To prepare the training data, you need to install the [Robot Operating System (ROS)](http://www.ros.org/) to parse rosbags.
 
-1. Download the raw data in rosbags
-2. Download the trajectories in protobufs
-3. Run the data preparation script
+Download the eVISMA dataset from [here](https://www.dropbox.com/s/s9nrx9eoen4tno0/rs_d435i_recording.tar.gz?dl=0).
+
+eVISMA is structured as follows:
 
 
 ## Visualize predicted depth
