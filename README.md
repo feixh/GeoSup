@@ -46,9 +46,9 @@ To prepare the training data, you need to
 
 \* While steps 1 - 3 are needed for training a depth predictor on monocular videos for most methods, steps 4 & 5 marked with an asterisk are specializaed to our proposed training pipeline.
 
-We provide a script to do so, which requires extra dependencies. Check the "Data preparation" section below on how to use the script.
+We provide a script to do so, which requires extra dependencies. If you plan to parse the raw data yourself, please check the "Data preparation" section below on how to use the script. 
 
-We also provide a subset of VISMA2, which is preprocessed and ready to use. See the section below on how to train on the preprocessed data.
+You can also skip the data preparation step and try out a preprocessed subset of VISMA2 too. See the instructions below on how to train on the preprocessed data.
 
 ## Train on preprocessed data
 
@@ -93,7 +93,7 @@ Note, the code is built on top of the GeoNet model of Yin *et al.* which jointly
 ## Data preparation
 
 ### Install ROS
-To prepare the training data, you need to install the [Robot Operating System (ROS)](http://www.ros.org/) to parse rosbags. Follow instructions on the website to install ROS.
+To prepare the training data yourself, you need to install the [Robot Operating System (ROS)](http://www.ros.org/) to parse rosbags. Follow instructions on the website to install ROS.
 
 ### Download data
 Once you have ROS properly installed. Download the VISMA2 dataset from [here](https://www.dropbox.com/s/s9nrx9eoen4tno0/rs_d435i_recording.tar.gz?dl=0), and unzip it into your folder of choice, say, `/home/feixh/Data/VISMA2`. For convenience, let's set the environment variable 
@@ -106,7 +106,7 @@ The VISMA2 folder should contain a list of subfolders, each of which is named af
 
 In terminal, first set the environment variable `VISMA2OUTPATH` pointing to the output directory where the parsed dataset should be kept. For instance
 
-`export VISMA2OUTPATH=./visma2_parsed`
+`export VISMA2OUTPATH=/home/feixh/Data/visma2_parsed`
 
 then parse the dataset:
 
@@ -130,13 +130,39 @@ To parse the sequences of your interests, you can add them to the `sequences` va
 
 ### Prepare the segmentation masks
 
-Once you have parsed the raw data and successfully extracted the image triplets, you can run your favoriate semantic segmentation system to obtain masks, which will be used to regularize depth predictions selectively.
+Once you have parsed the raw data and successfully extracted the image triplets, you can run your favoriate semantic segmentation system to obtain segmentation masks, which will be used to regularize depth predictions selectively in training.
 
-Here we give an example on how to use PSP-Net to segment the "copyrooms" subset of VISMA2, which we just parsed.
-
-
+We give an example on how to use PSP-Net to segment the "copyrooms" subset of VISMA2, which we just parsed. We assume the environment variable `$VISMA2OUTPATH` has been set properly in the previous step.
 
 
-## Visualize predicted depth
+1. First, download the trained model from [here](https://www.dropbox.com/s/l55doruz1dsfvmt/pspnet.tar.gz?dl=0). You can also follow the `README` in `GeoSup/PSPNet` to get the trained model provided by the authors of PSPNet.
+2. Unzip the tarball into `GeoSup/PSPNet/model` directory. Make sure the path of your checkpoint relative to your project directory looks like this: `GeoSup/PSPNet/model/ade20k_model/pspnet50/modep.ckpt-0.data` for the model trained on ADE20K indoor dataset, and `GeoSup/PSPNet/model/cityscapes_model/pspnet101/model.ckpt-0.data`. Otherwise, the weights cannot be found with the default setting. You can use a different path, but then you need to specify the path properly when you run the script below.
+3. In your terminal, go to `GeoSup/PSPNet`, and execute the following command:
 
+```bash
+python inference_visma2.py --dataset ade20k --dataroot $VISMA2OUTPATH
+```
 
+- `dataset` argument specifies models trained on which dataset to be used: ade20k for indoors and cityscapes for outdoors
+- `dataroot` argument should point to the output root directory of the parsed data 
+- Other arguments can be found in the `get_arguments` function of `inference_visma2.py` script.
+
+After executing this command, in each "copyroom" folder, you will find an extra `segmentation` folder along with the `depth`, `pose` and `rgb` folders which you obtained in the last step. The `segmentation` folder contains a list of segmentation masks in `.npy` format named after the timestamp of the image being segmented.
+
+### Split the data
+
+Once you have all the data ready, you can train the model. But before doing that, you need to generate train/test/val splits and saved them as txt files. See the text files (used for the copyroom example) in `GeoSup/GeoNet/data/void` as an template, and the `GeoSup/GeoNet/visma_dataloader.py` script on how the dataloader interacts with the file lists.
+
+## Visualize depth prediction
+
+We also provide the depth prediction of the copyroom subset -- both from the baseline and ours, and a script to show a head-to-head comparison. The prediction of the baseline GeoNet model and GeoNet+SIGL (ours) can be found [here](https://www.dropbox.com/s/wx2m0juwvbx5i5m/VOID_predictions.tar.gz?dl=0). Note, in training both models, we use the pose estimated by the VIO instead of the pose network, i.e., the `use_slam_pose` option is on during training these models.
+
+1. Download the prediction, and unzip the tarball into the directory of your choice, say, `/home/feixh/Data/prediction`. For convenience, point an env variable `$PREDPATH` to it.
+2. In `GeoSup/visualization/visualize_visma2.py`, change `project_dir` to your project root directory, and point `validation_dir` to where you keep the parsed dataset. 
+3. Now, go to `GeoSup/visualization` and
+
+```bash
+python visualize_visma2.py $PREDPATH/GeoNet_depth.npy $PREDPATH/GeoNet_SIGL_depth.npy
+```
+
+If everything works properly, you will see a figure showing the input RGB image, the ground-truth depth, the prediction from both the baseline and ours, and the associated error maps.
