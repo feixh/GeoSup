@@ -38,11 +38,13 @@ The eVISMA dataset contains raw monocular video streams of VGA size (640x480) @ 
 In addition to the raw data streams, we also provide the camera trajectory estimated by the visual-inertial odometry (VIO) system developed at our lab. The time-stamped camera poses and the camera-to-body alginment will be used to bring gravity from the spatial frame to the camera frame in the experiments. The trajectories are stored in binary [protbufs](https://developers.google.com/protocol-buffers/) defined by custom protocols.
 
 To prepare the training data, you need to 
-- construct image triplets,
-- compute the transformation to bring gravity to the camera frame, and 
-- extract the depth image for validation/testing.
- 
-In addition, if you want to replace the auxiliary pose network with the pose estimated by VIO at training time, you need to compute the relative camera poses from the trajectories.
+1. construct image triplets,
+2. compute the transformation to bring gravity to the camera frame, and 
+3. extract the depth image for validation/testing, and optionally
+4. \* compute segmentation masks to apply our regularizer *selectively*
+5. \* at training time, if you want to replace the auxiliary pose network with the pose estimated by VIO, you need to compute the relative camera poses from the trajectories.
+
+\* While steps 1 - 3 are needed for training a depth predictor on monocular videos for most methods, steps 4 & 5 marked with an asterisk are specializaed to our proposed training pipeline.
 
 We provide a script to do so, which requires extra dependencies. Check the "Data preparation" section below on how to use the script.
 
