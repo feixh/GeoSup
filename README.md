@@ -22,7 +22,7 @@ Related materials:
 - [project site](https://feixh.github.io/projects/icra19/index.html)
 - [paper][icra19_paper], [poster][icra19_poster], and [slides][icra19_slides] as presented at ICRA, 2019.
 - [VISMA](https://github.com/feixh/VISMA) dataset used in the experiments.
-- [Extended VISMA (eVISMA)]() dataset, a large-scale extension of VISMA built for learning-based visual-inertial sensor fusion.
+- [VISMA2]() dataset, a large-scale extension of the original VISMA, built for the development of learning-based visual-inertial sensor fusion.
 
 [icra19_paper]: https://arxiv.org/abs/1807.11130v3.pdf
 [icra19_poster]: {{site.url}}/empty.html
@@ -31,9 +31,9 @@ Related materials:
 
 ---
 
-## eVISMA dataset
+## VISMA2 dataset
 
-The eVISMA dataset contains raw monocular video streams of VGA size (640x480) @ 30 Hz, inertial measurements @ 400 Hz, and depth streams of VGA size @ 30 Hz stored in [rosbags](http://wiki.ros.org/rosbag). 
+The VISMA2 dataset contains raw monocular video streams of VGA size (640x480) @ 30 Hz, inertial measurements @ 400 Hz, and depth streams of VGA size @ 30 Hz stored in [rosbags](http://wiki.ros.org/rosbag). 
 
 In addition to the raw data streams, we also provide the camera trajectory estimated by the visual-inertial odometry (VIO) system developed at our lab. The time-stamped camera poses and the camera-to-body alginment will be used to bring gravity from the spatial frame to the camera frame in the experiments. The trajectories are stored in binary [protbufs](https://developers.google.com/protocol-buffers/) defined by custom protocols.
 
@@ -46,18 +46,18 @@ In addition, if you want to replace the auxiliary pose network with the pose est
 
 We provide a script to do so, which requires extra dependencies. Check the "Data preparation" section below on how to use the script.
 
-We also provide a subset of eVISMA, which is preprocessed and ready to use. See the section below on how to train on the preprocessed data.
+We also provide a subset of VISMA2, which is preprocessed and ready to use. See the section below on how to train on the preprocessed data.
 
 ## Train on preprocessed data
 
-A preprocessed subset of eVISMA can be found [here](https://www.dropbox.com/s/kccsd0h0wg85ytx/copyrooms.tar.gz?dl=0). Follow the instructions below to use it.
+A preprocessed subset of VISMA2 can be found [here](https://www.dropbox.com/s/kccsd0h0wg85ytx/copyrooms.tar.gz?dl=0). Follow the instructions below to use it.
 
 1. Download the tar ball and unzip it into your directory of choice, say `/home/feixh/Data/copyrooms`. And set the environment variable `export EXAMPLEPATH=/home/feixh/Data/copyrooms`. (Note in your data folder, you should see copyroom1, copyroom2, train.txt, etc.)
 
 
 4. In your terminal, go to `GeoSup/GeoNet` sub-directory, and execute the following command. Note you should replace `example_checkpoints` with directory of your choice to store checkpoints.
 
-```
+```bash
 python geonet_main.py \
   --mode train_rigid \
   --dataset_dir $EXAMPLEPATH \
@@ -90,11 +90,49 @@ Note, the code is built on top of the GeoNet model of Yin *et al.* which jointly
 
 ## Data preparation
 
-To prepare the training data, you need to install the [Robot Operating System (ROS)](http://www.ros.org/) to parse rosbags.
+### Install ROS
+To prepare the training data, you need to install the [Robot Operating System (ROS)](http://www.ros.org/) to parse rosbags. Follow instructions on the website to install ROS.
 
-Download the eVISMA dataset from [here](https://www.dropbox.com/s/s9nrx9eoen4tno0/rs_d435i_recording.tar.gz?dl=0).
+### Download data
+Once you have ROS properly installed. Download the VISMA2 dataset from [here](https://www.dropbox.com/s/s9nrx9eoen4tno0/rs_d435i_recording.tar.gz?dl=0), and unzip it into your folder of choice, say, `/home/feixh/Data/VISMA2`. For convenience, let's set the environment variable 
 
-eVISMA is structured as follows:
+`export VISMA2PATH=/home/feixh/Data/VISMA2`
+
+The VISMA2 folder should contain a list of subfolders, each of which is named after the place where the data is recorded, e.g., classroom0, copyroom1, and stairs3, etc. In each subfolder, there is a `raw.bag` file containing the raw recorded data, and a `dataset` file containing the trajectory and other meta information dumped by our VIO system. There are also two dataset files, namely, `dataset_500` and `dataset_1500`, which are from different runs of the VIO, and can be ignored for now.
+
+### Parse the raw data 
+
+In terminal, first set the environment variable `VISMA2OUTPATH` pointing to the output directory where the parsed dataset should be kept. For instance
+
+`export VISMA2OUTPATH=./visma2_parsed`
+
+then parse the dataset:
+
+```bash
+python setup/setup_dataset_visma2.py \
+  --recording-dir $VISMA2PATH \
+  --output-root  $VISMA2OUTPATH \
+  --temporal-interval 5 \
+  --spatial-interval 0.01
+```
+
+The meaning of the arguments is quite straightforward, and more detailed documentation can be found in the `setup/setup_dataset_visma2.py` script.
+
+After running this script, in the folder `$VISMA2OUTPATH`, you will see five subfolders, namely, `copyroom0~copyroom4`. In each subfolder, you will find the follows:
+1. `K.npy` as the camera intrinsics
+2. `rgb` folder, which contains a list of image triplets concatenated horizontally. The center image is called the "reference" image. Each file is named after the timestamp of the reference image.
+2. `depth` folder, which contains a list of depth images in `.npy` format. Each depth image corresponds to the reference image in the triplet which has the same filename.
+3. `pose` folder, which contains the relative camera pose between the other two images in the triplet and the reference, and the rotation to bring gravity to the camera frame of the reference. Each pose file is stored in `.pkl` format, and has the timestamp of the reference image as the filename.
+
+To parse the sequences of your interests, you can add them to the `sequences` varialbe at the top of the `setup_dataset_visma2.py` script.  For now, as you might have noticed, only copyroom0~copyroom4 are added to the variable.
+
+### Prepare the segmentation masks
+
+Once you have parsed the raw data and successfully extracted the image triplets, you can run your favoriate semantic segmentation system to obtain masks, which will be used to regularize depth predictions selectively.
+
+Here we give an example on how to use PSP-Net to segment the "copyrooms" subset of VISMA2, which we just parsed.
+
+
 
 
 ## Visualize predicted depth
