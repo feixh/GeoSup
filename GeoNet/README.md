@@ -1,4 +1,4 @@
-# GeoNet
+# GeoNet [ORIGINAL README]
 
 This is a Tensorflow implementation of our paper:
 

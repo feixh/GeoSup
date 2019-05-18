@@ -166,3 +166,10 @@ python visualize_visma2.py $PREDPATH/GeoNet_depth.npy $PREDPATH/GeoNet_SIGL_dept
 ```
 
 If everything works properly, you will see a figure showing the input RGB image, the ground-truth depth, the prediction from both the baseline and ours, and the associated error maps.
+
+--- 
+## References
+
+[1] GeoNet: https://github.com/yzcjtr/GeoNet
+
+[2] PSPNet: https://github.com/hellochick/PSPNet-tensorflow
