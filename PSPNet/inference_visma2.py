@@ -126,6 +126,14 @@ if __name__ == '__main__':
     # with open(os.path.join(dataroot, 'all.txt'), 'r') as fid:
     #     entries = fid.readlines()
 
+    # COLLECT ALL THE IMAGE TRIPLETS
+    for r, d, f in os.walk(dataroot):
+        for entry in f:
+            if '.jpg' in entry:
+                entries.append(os.path.join(r, entry))
+    print('Found {} triplets in total'.format(len(entries)))
+
+
     entries = [os.path.join(dataroot, x.strip()) for x in entries]
     sess.run(iterator.initializer, feed_dict={entry_placeholder: entries})
 
