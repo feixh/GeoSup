@@ -5,7 +5,7 @@
 [UCLA Vision Lab](http://vision.ucla.edu/)
 
 
-If you find the paper or the code in this repo useful, please cite the following paper:
+If you find the [paper][icra19_paper] or the code in this repo useful, please cite the following paper:
 
 ```
 @incollection{feiWS19,
@@ -20,14 +20,12 @@ If you find the paper or the code in this repo useful, please cite the following
 
 Related materials:
 - [project site](https://feixh.github.io/projects/icra19/index.html)
-- [paper][icra19_paper], [poster][icra19_poster], and [slides][icra19_slides] as presented at ICRA, 2019.
 - [VISMA](https://github.com/feixh/VISMA) dataset used in the experiments.
-- [VISMA2]() dataset, a large-scale extension of the original VISMA, built for the development of learning-based visual-inertial sensor fusion.
+- [VISMA2][visma2_data] dataset, a large-scale extension of the original VISMA, built for the development of learning-based visual-inertial sensor fusion.
 
 [icra19_paper]: https://arxiv.org/abs/1807.11130v3.pdf
-[icra19_poster]: {{site.url}}/empty.html
-[icra19_slides]: {{site.url}}/empty.html
 [icra19_code]: https://github.com/feixh/GeoSup
+[visma2_data]: https://www.dropbox.com/s/s9nrx9eoen4tno0/rs_d435i_recording.tar.gz?dl=0
 
 ---
 
@@ -96,7 +94,7 @@ Note, the code is built on top of the GeoNet model of Yin *et al.* which jointly
 To prepare the training data yourself, you need to install the [Robot Operating System (ROS)](http://www.ros.org/) to parse rosbags. Follow instructions on the website to install ROS.
 
 ### Download data
-Once you have ROS properly installed. Download the VISMA2 dataset from [here](https://www.dropbox.com/s/s9nrx9eoen4tno0/rs_d435i_recording.tar.gz?dl=0), and unzip it into your folder of choice, say, `/home/feixh/Data/VISMA2`. For convenience, let's set the environment variable 
+Once you have ROS properly installed. Download the VISMA2 dataset from [here][visma2_data], and unzip it into your folder of choice, say, `/home/feixh/Data/VISMA2`. For convenience, let's set the environment variable 
 
 `export VISMA2PATH=/home/feixh/Data/VISMA2`
 
