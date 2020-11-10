@@ -4,6 +4,7 @@
 
 [UCLA Vision Lab](http://vision.ucla.edu/)
 
+The paper has won the *Best Paper Award in Robot Vision* at ICRA 2019.
 
 If you find the [paper][icra19_paper] or the code in this repo useful, please cite the following paper:
 
